@@ -22,25 +22,29 @@ def draw_cat_plot():
 
     # Group and reformat the data to split it by 'cardio'. Show the counts of each feature. You will have to rename one of the collumns for the catplot to work correctly.
 
-    fig = sns.catplot(data=df_cat, kind="count", x="variable", hue="value", col="cardio")
+    fig = sns.catplot(data=df_cat, kind="count", x="variable", hue="value", col="cardio").set(ylabel = "total").fig
 
     # Do not modify the next two lines
     fig.savefig('catplot.png')
     return fig
-
+draw_cat_plot()
 # Draw Heat Map
 def draw_heat_map():
     # Clean the data
-    df_heat = df[(df['height'] >= df['height'].quantile(0.025)) & (df['height'] <= df['height'].quantile(0.975)) ]
-    df_heat = df_heat[(df_heat["weight"] >= df_heat['weight'].quantile(0.025)) & (df_heat["weight"] <= df_heat['weight'].quantile(0.975))]
-    df_heat = df_heat[df_heat['ap_lo'] <= df_heat['ap_hi']]
+    df_heat = df[(df['ap_lo'] <= df['ap_hi'])
+            & (df['height'] >= df['height'].quantile(0.025))
+            & (df['height'] <= df['height'].quantile(0.975))
+            & (df['weight'] >= df['weight'].quantile(0.025))
+            & (df['weight'] <= df['weight'].quantile(0.975))
+    ]
+
     
 
     # Calculate the correlation matrix
-    corr = np.round(df_heat.corr(),1)
+    corr = df_heat.corr()
     
     # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(corr, dtype=np.bool))
+    mask = np.triu(corr)
 
 
 
@@ -48,10 +52,8 @@ def draw_heat_map():
     fig, ax = plt.subplots(figsize=(9,9))
 
     # Draw the heatmap with 'sns.heatmap()'
-    sns.heatmap(corr,mask=mask,square=True, annot=True)
+    sns.heatmap(corr,mask=mask,fmt=".1f",square=True, annot=True)
 
     # Do not modify the next two lines
     fig.savefig('heatmap.png')
     return fig
-draw_heat_map()
-
